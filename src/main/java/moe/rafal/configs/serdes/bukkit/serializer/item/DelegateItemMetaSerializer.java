@@ -11,6 +11,9 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -30,8 +33,23 @@ public class DelegateItemMetaSerializer extends ItemMetaSerializer {
             data.add("unbreakable", true);
         }
 
+        if (object instanceof PotionMeta) {
+            PotionMeta potionMeta = (PotionMeta) object;
+
+            data.add("effect", potionMeta.getBasePotionData());
+
+            if (potionMeta.hasCustomEffects()) {
+                data.add("custom-effects", potionMeta.getCustomEffects());
+            }
+
+            if (potionMeta.hasColor()) {
+                data.add("color", potionMeta.getColor());
+            }
+        }
+
+
         if (object instanceof LeatherArmorMeta) {
-            data.add("color", ((LeatherArmorMeta) object).getColor());
+            data.add("leather-color", ((LeatherArmorMeta) object).getColor());
         }
 
         if (object.getAttributeModifiers() != null && object.getAttributeModifiers().size() > 0) {
@@ -47,6 +65,26 @@ public class DelegateItemMetaSerializer extends ItemMetaSerializer {
 
         if (data.containsKey("unbreakable")) {
             itemMeta.setUnbreakable(data.get("unbreakable", boolean.class));
+        }
+
+        if (data.containsKey("effect") || data.containsKey("custom-effects")) {
+            ItemStack potionItemStack = new ItemStack(Material.POTION);
+            ItemMeta  potionItemMeta  = Objects.requireNonNull(potionItemStack.getItemMeta());
+
+            PotionData effectData = data.get("effect", PotionData.class);
+
+            PotionMeta potionMeta = (PotionMeta) potionItemMeta;
+            potionMeta.setBasePotionData(effectData);
+
+            if (data.getAsList("custom-effects", PotionEffect.class) != null) {
+                data.getAsList("custom-effects", PotionEffect.class).forEach(potionEffect -> potionMeta.addCustomEffect(potionEffect, true));
+            }
+
+            if (data.get("color", Color.class) != null) {
+                potionMeta.setColor(data.get("color", Color.class));
+            }
+
+            itemMeta = mergeItemMeta(itemMeta, potionMeta);
         }
 
         if (data.containsKey("leather-color")) {
