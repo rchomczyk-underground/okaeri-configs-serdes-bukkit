@@ -21,18 +21,26 @@ public class StringToColorTransformer extends BidirectionalTransformer<String, C
 
     @Override
     public Color leftToRight(@NotNull String data, @NotNull SerdesContext serdesContext) {
-        int[] palette = Arrays.stream(data.split(PALETTE_VALUE_SEPARATOR))
-            .mapToInt(Integer::parseInt)
-            .toArray();
-        return Color.fromRGB(
-            palette[0],
-            palette[1],
-            palette[2]);
+        return mutateIntoColor(data);
     }
 
     @Override
     public String rightToLeft(@NotNull Color data, @NotNull SerdesContext serdesContext) {
-        return Stream.of(data.getRed(), data.getBlue(), data.getRed())
+        return mutateFromColor(data);
+    }
+
+    Color mutateIntoColor(@NotNull String value) {
+        int[] components = Arrays.stream(value.split(PALETTE_VALUE_SEPARATOR))
+            .mapToInt(Integer::parseInt)
+            .toArray();
+        return Color.fromRGB(
+            components[0],
+            components[1],
+            components[2]);
+    }
+
+    String mutateFromColor(@NotNull Color value) {
+        return Stream.of(value.getRed(), value.getGreen(), value.getBlue())
             .map(String::valueOf)
             .collect(Collectors.joining(PALETTE_VALUE_SEPARATOR));
     }
