@@ -119,12 +119,12 @@
 
     <distributionManagement>
         <repository>
-            <id>rafal-moe-repository-releases</id>
-            <url>https://repo.rafal.moe/releases/</url>
+            <id>auroramc-pl-repo-releases</id>
+            <url>https://repo.auroramc.pl/releases/</url>
         </repository>
         <snapshotRepository>
-            <id>rafal-moe-repository-snapshots</id>
-            <url>https://repo.rafal.moe/snapshots/</url>
+            <id>auroramc-pl-repo-snapshots</id>
+            <url>https://repo.auroramc.pl/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
